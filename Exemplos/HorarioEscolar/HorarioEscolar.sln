@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HorarioEscolar", "HorarioEscolar.csproj", "{E65CC80D-39BA-6B90-3D03-2522F854B01A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E65CC80D-39BA-6B90-3D03-2522F854B01A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E65CC80D-39BA-6B90-3D03-2522F854B01A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E65CC80D-39BA-6B90-3D03-2522F854B01A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E65CC80D-39BA-6B90-3D03-2522F854B01A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {747D256A-E98A-4D0D-9517-39FB7665EBB0}
+	EndGlobalSection
+EndGlobal

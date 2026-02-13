@@ -7,7 +7,7 @@ namespace AlgoritmoGenetico.Mutacao
     /// Estratégia de mutação que incide sobre um único ponto ou processo por indivíduo.
     /// Implementa mutação adaptativa, aumentando a probabilidade quando a evolução estagna.
     /// </summary>
-    public class Unica<TCromossoma> : IMutacao<TCromossoma>
+    public abstract class Unica<TCromossoma> : IMutacaoService<TCromossoma>
     where TCromossoma : ICromossoma<IGene>
     {
         protected const double MUTACAO_FATOR_PROGRESSO = 0.0001d;
@@ -46,17 +46,13 @@ namespace AlgoritmoGenetico.Mutacao
             }
         }
 
-        public virtual void Mutar(List<TCromossoma> populacao, AGConfiguracao<TCromossoma> configuracao, int geracoesSemEvolucao)
+        public virtual void Mutar(List<TCromossoma> populacao, int geracoesSemEvolucao)
         {
             AjustarFatorMutacao(geracoesSemEvolucao);
 
-            if (configuracao.ProcessarMutacaoCallback is null)
-            {
-                return;
-            }
-
-            populacao.ForEach(individuo => configuracao.ProcessarMutacaoCallback(individuo, configuracao));
+            populacao.ForEach(individuo => ProcessarMutacao(individuo));
         }
+        public abstract void ProcessarMutacao(TCromossoma individuoAProcessar);
 
         /// <summary>
         /// Verifica se um gene deve mutar, diferenciando as taxas entre genes com e sem colisão.

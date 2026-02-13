@@ -1,34 +1,22 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using HorarioEscolar.Estrutura;
 
 namespace HorarioEscolar.Helper
 {
-    public static class ProfessorHelper
+    public class ProfessorCSVService : ProfessorBaseService
     {
-        public static Dictionary<string, ProfessorCSV>? Professores;
-
-        public static List<ProfessorCSV>? ToList()
+        public ProfessorCSVService(IHorarioService horarioService) : base(horarioService)
         {
-            return Professores!.Values.ToList();
         }
 
-        public static int ObterProfIndicacaoDeTempoBloqueado(string? prof, int diaDaSemana, string hora)
+        public override void CarregarDados()
         {
-            if (prof is null)
-            {
-                return 0;
-            }
-            ProfessorCSV profAConsultar = Professores![prof];
-            return profAConsultar.TemposLetivos[HorarioHelper.ObterIndexAPartirDaHora(hora) * HorarioHelper.DiasDaSemanaIndex.Count + diaDaSemana];
-
+            // Unificamos o carregamento dos dois CSVs aqui
+            if (!TryCarregarProfessores()) throw new Exception("Falha ao carregar professores.");
         }
-        public static bool TryCarregarProfessores()
+        public bool TryCarregarProfessores()
         {
             string filePath = @"./DATA/profs_horarios.csv";
 

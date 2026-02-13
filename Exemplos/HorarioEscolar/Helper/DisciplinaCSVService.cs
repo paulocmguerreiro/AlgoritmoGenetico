@@ -1,37 +1,26 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using HorarioEscolar.Estrutura;
 
 namespace HorarioEscolar.Helper
 {
-    public static class DisciplinaHelper
+    public class DisciplinaCSVService : DisciplinaBaseService
     {
-        public static Dictionary<string, DisciplinaCSV>? Disciplinas;
-        public static List<int> ObterTemposLetivosDaDisciplinaProfessor(string disciplinaProfessor)
+        public DisciplinaCSVService(IHorarioService horarioService) : base(horarioService)
         {
-            ValidarDisciplinasInicializacao();
-            return Disciplinas![disciplinaProfessor].TemposLetivos;
-        }
-        public static List<string> ObterSalasDaDisciplinaProfessor(string disciplinaProfessor)
-        {
-            ValidarDisciplinasInicializacao();
-            return Disciplinas![disciplinaProfessor].Salas;
         }
 
-        public static string ObterSalaAleatoriaDaDisciplina(string disciplinaProfessor)
+        public override void CarregarDados()
         {
-            List<string> salasDaDisciplina = ObterSalasDaDisciplinaProfessor(disciplinaProfessor);
-            return salasDaDisciplina[Random.Shared.Next(salasDaDisciplina.Count)];
+            if (!TryCarregarDisciplinas()) throw new Exception("Falha ao carregar disciplinas.");
+            if (!TryCarregarSalas()) throw new Exception("Falha ao carregar salas.");
         }
-        public static bool TryCarregarDisciplinas()
+
+        private bool TryCarregarDisciplinas()
         {
             string filePath = @"./DATA/disciplinas.csv";
-            Disciplinas = null;
+            _disciplinas = null;
 
             try
             {
@@ -51,7 +40,7 @@ namespace HorarioEscolar.Helper
                         DisciplinasDict[record.Sigla] = record;
                     });
 
-                    Disciplinas = DisciplinasDict;
+                    _disciplinas = DisciplinasDict;
                     return true;
                 }
             }
@@ -75,19 +64,11 @@ namespace HorarioEscolar.Helper
             return false;
         }
 
-        private static void ValidarDisciplinasInicializacao()
-        {
-            if (Disciplinas is null)
-            {
-                throw new NullReferenceException("Disciplinas não foram inicializados");
-            }
-
-        }
-        public static bool TryCarregarSalas()
+        private bool TryCarregarSalas()
         {
             string filePath = @"./DATA/disciplinas_salas.csv";
 
-            ValidarDisciplinasInicializacao();
+            ValidarInicializacao();
 
             try
             {
@@ -113,12 +94,12 @@ namespace HorarioEscolar.Helper
                         DisciplinasSalasDict[record.Sigla] = new DisciplinaCSV
                         {
                             Sigla = record.Sigla,
-                            TemposLetivos = Disciplinas![record.Sigla].TemposLetivos,
+                            TemposLetivos = _disciplinas![record.Sigla].TemposLetivos,
                             Salas = record.Salas,
                         };
                     });
 
-                    Disciplinas = DisciplinasSalasDict;
+                    _disciplinas = DisciplinasSalasDict;
                     return true;
                 }
             }

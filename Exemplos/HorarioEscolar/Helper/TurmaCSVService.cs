@@ -1,53 +1,24 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO.Compression;
-using System.Linq;
-using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using HorarioEscolar.Estrutura;
 
 namespace HorarioEscolar.Helper
 {
-    public static class TurmaHelper
+    public class TurmaCSVService : TurmaBaseService
     {
-
-        public static Dictionary<string, TurmaCSV>? Turmas;
-        private static List<TurmaCSV>? _turmasList;
-
-        public static void ValidarTurmasInicializacao()
+        public TurmaCSVService(IHorarioService horarioService) : base(horarioService)
         {
-            if (Turmas is null)
-            {
-                throw new NullReferenceException("Turmas não foram inicializadas");
-            }
-        }
-        public static Dictionary<string, TurmaCSV> ToDictionary()
-        {
-            ValidarTurmasInicializacao();
-            return Turmas!;
-
         }
 
-        public static List<TurmaCSV> AsList()
+        public override void CarregarDados()
         {
-            ValidarTurmasInicializacao();
-            return _turmasList!;
+            if (!TryCarregarTurmas()) throw new Exception("Falha ao carregar as Turmas");
+            if (!TryCarregarTurmaHorario()) throw new Exception("Falha ao carregar os Horários das Turmas");
+            if (!TryCarregarTurmaProfessores()) throw new Exception("Falha ao carregar os Professores das Turmas");
         }
 
-        public static int ObterTurmaIndicacaoDeTempoBloqueado(string? turma, int diaDaSemana, string hora)
-        {
-            if (turma is null)
-            {
-                return 0;
-            }
-            ValidarTurmasInicializacao();
-            TurmaCSV turmaAConsultar = Turmas![turma];
-            return turmaAConsultar.TemposLetivos[HorarioHelper.ObterIndexAPartirDaHora(hora) * HorarioHelper.DiasDaSemanaIndex.Count + diaDaSemana];
-        }
-
-        public static bool TryCarregarTurmas()
+        public bool TryCarregarTurmas()
         {
             string filePath = @"./DATA/turmas.csv";
             Turmas = null;
@@ -102,7 +73,7 @@ namespace HorarioEscolar.Helper
             return false;
         }
 
-        public static bool TryCarregarTurmaHorario()
+        public bool TryCarregarTurmaHorario()
         {
             string filePath = @"./DATA/turmas_horarios.csv";
 
@@ -159,7 +130,7 @@ namespace HorarioEscolar.Helper
             return false;
         }
 
-        public static bool TryCarregarTurmaProfessores()
+        public bool TryCarregarTurmaProfessores()
         {
             string filePath = @"./DATA/turmas_disciplinas_profs.csv";
 

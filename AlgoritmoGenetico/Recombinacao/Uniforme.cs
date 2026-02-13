@@ -6,7 +6,7 @@ namespace AlgoritmoGenetico.Recombinacao
     /// Implementa o Crossover Uniforme.
     /// Para cada gene, decide aleatoriamente (50% de probabilidade) de qual pai o filho herdará a informação.
     /// </summary>
-    public class Uniforme<TCromossoma> : IRecombinacao<TCromossoma>
+    public class Uniforme<TCromossoma>(ICromossomaFactory<TCromossoma> cromossomaFactory) : RecombinacaoBase<TCromossoma>(cromossomaFactory)
     where TCromossoma : ICromossoma<IGene>
     {
         protected List<TCromossoma> NovaPopulacao = [];
@@ -17,10 +17,10 @@ namespace AlgoritmoGenetico.Recombinacao
         /// <summary>
         /// Realiza a combinação gene a gene com base em sorteio probabilístico.
         /// </summary>
-        public List<TCromossoma> Combinar(TCromossoma pai1, TCromossoma pai2)
+        public override List<TCromossoma> Combinar(TCromossoma pai1, TCromossoma pai2)
         {
-            TCromossoma filho1 = (TCromossoma)TCromossoma.CriarVazio();
-            TCromossoma filho2 = (TCromossoma)TCromossoma.CriarVazio();
+            TCromossoma filho1 = cromossomaFactory.CriarVazio();
+            TCromossoma filho2 = cromossomaFactory.CriarVazio();
 
             IReadOnlyList<IGene> pai1Genes = pai1.Genes as IReadOnlyList<IGene> ?? pai1.Genes.ToList();
             IReadOnlyList<IGene> pai2Genes = pai2.Genes as IReadOnlyList<IGene> ?? pai2.Genes.ToList();
@@ -32,8 +32,8 @@ namespace AlgoritmoGenetico.Recombinacao
                 filho1.AdicionarGene((trocarPosicoes ? pai1Genes : pai2Genes)[i]);
                 filho2.AdicionarGene((trocarPosicoes ? pai2Genes : pai1Genes)[i]);
             }
-            filho1.ResetFitness();
-            filho2.ResetFitness();
+            filho1.Reset();
+            filho2.Reset();
             return [filho1, filho2];
         }
     }

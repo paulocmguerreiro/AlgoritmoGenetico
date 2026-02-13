@@ -11,20 +11,13 @@ namespace AlgoritmoGenetico.Recombinacao
     /// Não realiza mistura genética; os filhos são clones exatos dos pais. 
     /// Útil para algoritmos que dependem exclusivamente de mutação ou para depuração (debugging).
     /// </summary>
-    public class SemRecombinacao<TCromossoma>(ICromossomaFactory<TCromossoma> cromossomaFactory) : RecombinacaoBase<TCromossoma>(cromossomaFactory)
+    public abstract class RecombinacaoBase<TCromossoma>(ICromossomaFactory<TCromossoma> cromossomaFactory) : IRecombinacao<TCromossoma>
     where TCromossoma : ICromossoma<IGene>
     {
-        /// <summary>
-        /// Devolve cópias dos dois progenitores sem alterações.
-        /// </summary>
-        public override List<TCromossoma> Combinar(TCromossoma pai1, TCromossoma pai2)
-        {
-            return [(TCromossoma)pai1.Clone(), (TCromossoma)pai2.Clone()];
-        }
-
+        public abstract List<TCromossoma> Combinar(TCromossoma pai1, TCromossoma pai2);
         public override string ToString()
         {
-            return "Sem estratégia de recombinação.";
+            return "";
         }
     }
 }

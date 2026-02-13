@@ -13,30 +13,25 @@ namespace AlgoritmoGenetico.Individuo
         IEnumerable<TGene> Genes { get; }
 
         /// <summary> Obtém o valor de avaliação (qualidade) da solução. </summary>
-        int Fitness { get; }
+        int Fitness { get; set; }
 
         /// <summary> 
         /// Obtém um código identificador único (hash) baseado na composição dos genes. 
         /// Útil para distinguir indivíduos distintos com o mesmo Fitness.
         /// </summary>
-        int CodigoUnico { get; }
-
-        /// <summary> Reinicializa o valor de fitness para forçar um novo cálculo de avaliação. </summary>
-        /// <returns>A própria instância do cromossoma para encadeamento de métodos.</returns>
-        ICromossoma<TGene> ResetFitness();
+        int CodigoUnico { get; set; }
 
         /// <summary> Prepara o cromossoma para uso, executando lógicas de pré-processamento se necessário. </summary>
         void Inicializar();
 
+        /// <summary>
+        /// Limpar os valores do Fitness e CodigoUnico
+        /// </summary>
+        void Reset();
+
         /// <summary> Adiciona um novo gene à estrutura do cromossoma. </summary>
         /// <param name="gene">O gene a ser adicionado.</param>
         void AdicionarGene(IGene gene);
-
-        /// <summary> Método de fábrica para criar uma nova instância de um cromossoma sem genes. </summary>
-        static abstract ICromossoma<TGene> CriarVazio();
-
-        /// <summary> Método de fábrica para criar um cromossoma com genes gerados aleatoriamente. </summary>
-        static abstract ICromossoma<TGene> CriarAleatorio();
 
         /// <summary> Cria uma cópia profunda (deep clone) do cromossoma e dos seus genes. </summary>
         public abstract ICromossoma<TGene> Clone();

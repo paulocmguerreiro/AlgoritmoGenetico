@@ -47,36 +47,6 @@ namespace AlgoritmoGenetico.Extensao
         internal static List<TCromossoma> DistinctByFitness<TCromossoma>(this IEnumerable<TCromossoma> populacao)
         where TCromossoma : ICromossoma<IGene> => populacao.DistinctBy((gene) => (gene.Fitness, gene.CodigoUnico)).ToList();
 
-        /// <summary>
-        /// Calcula o fitness de todos os indivíduos em paralelo, utilizando a capacidade multi-core do CPU.
-        /// Deixa dois núcleos livres (Environment.ProcessorCount - 2) para manter a fluidez do sistema.
-        /// </summary>
-        internal static void RecalcularFitness<TCromossoma>(this List<TCromossoma> populacao)
-        where TCromossoma : ICromossoma<IGene>
-        {
-
-            ParallelOptions options = new ParallelOptions
-            {
-                MaxDegreeOfParallelism = Environment.ProcessorCount - 2
-            };
-            Parallel.For(0, populacao.Count, options, filhos =>
-            {
-                int _ = populacao[filhos].Fitness;
-            });
-        }
-
-        /// <summary>
-        /// Efetua o reset ao fitness dos individuos por forma a forçar o recalculo 
-        /// </summary>
-        internal static List<TCromossoma> ResetFitness<TCromossoma>(this List<TCromossoma> populacao)
-        where TCromossoma : ICromossoma<IGene>
-        {
-            foreach (TCromossoma individuo in populacao)
-            {
-                individuo.ResetFitness();
-            }
-            return populacao;
-        }
 
         /// <summary>
         /// Escolhe aleatoriamente um individuo na população

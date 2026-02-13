@@ -45,10 +45,11 @@ namespace AlgoritmoGenetico
 
         private long _feedbackVisualizadoNoSegundo = 0;
 
+
         public int GeracaoAtual { get; protected set; }
-        public float SolucaoCandidataFitness { get => SolucaoCandidata.Fitness; }
+        public float SolucaoCandidataFitness { get => SolucaoCandidata?.Fitness ?? 0; }
         /// <summary> A melhor solução (indivíduo) encontrada até ao momento. </summary>
-        public TCromossoma SolucaoCandidata { get; protected set; } = (TCromossoma)TCromossoma.CriarAleatorio();
+        public TCromossoma? SolucaoCandidata { get; protected set; }
 
         /// <summary> A população de indivíduos da geração corrente. </summary>
         public List<TCromossoma> Populacao { get; protected set; } = new List<TCromossoma>();
@@ -63,22 +64,25 @@ namespace AlgoritmoGenetico
         public void ProcurarSolucao()
         {
             Relogio.Start();
+            Configuracao.OutputService.OnEvolucaoIniciada();
             InicializarAlgoritmo();
+            RecalcularFitness(Populacao);
 
             while (!EncontrouSolucaoAdequada() && GeracaoAtual < Configuracao.LimiteMáximoDeGeracoesPermitidas)
             {
                 // Gerar Filhos - Ponto de partida
                 List<TCromossoma> populacaoFilhos = CriarPopulacaoDeFilhos();
-                populacaoFilhos.RecalcularFitness();
+                RecalcularFitness(populacaoFilhos);
 
                 // Mutar Filhos
                 Configuracao.ProcessoDeSelecaoDaProximaGeracao.Preparar(populacaoFilhos, Configuracao);
-                Configuracao.ProcessoDeMutacao.Mutar(populacaoFilhos, Configuracao, QuantidadeGeracoesSemEvolucao);
-                populacaoFilhos.RecalcularFitness();
+                Configuracao.ProcessoDeMutacao.Mutar(populacaoFilhos, QuantidadeGeracoesSemEvolucao);
+                RecalcularFitness(populacaoFilhos);
 
                 ReintroduzirSolucaoCandidata();
 
                 // Geração dos Pais
+                //RecalcularFitness(Populacao);
                 Configuracao.ProcessoDeSelecaoDaProximaGeracao.Preparar(Populacao, Configuracao);
                 Populacao = Configuracao.ProcessoDeSelecaoDaProximaGeracao
                     .EscolherPopulacao()
@@ -108,7 +112,7 @@ namespace AlgoritmoGenetico
             }
 
             // Garantir que mostra efetivamente o estado final (pode ter terminado dentro do período de feedback)
-            FornecerFeedback(false);
+            Configuracao.OutputService.OnEvolucaoTerminada();
         }
 
         /// <summary>
@@ -118,7 +122,7 @@ namespace AlgoritmoGenetico
         {
             if (Configuracao.ReporSolucaoCandidataNaPopulacaoACadaGeracao > 0 && GeracaoAtual % Configuracao.ReporSolucaoCandidataNaPopulacaoACadaGeracao == 0)
             {
-                Populacao.Add((TCromossoma)SolucaoCandidata.Clone());
+                Populacao.Add((TCromossoma)(SolucaoCandidata ?? Configuracao.CromossomaFactory.CriarAleatorio()).Clone());
             }
         }
 
@@ -148,8 +152,8 @@ namespace AlgoritmoGenetico
         /// </summary>
         protected bool EncontrouSolucaoAdequada() => Configuracao.ProcessoDeEvolucao switch
         {
-            AGProcessoDeEvolucao.MINIMIZACAO => SolucaoCandidata.Fitness <= Configuracao.FitnessPretendido,
-            AGProcessoDeEvolucao.MAXIMIZACAO => SolucaoCandidata.Fitness >= Configuracao.FitnessPretendido,
+            AGProcessoDeEvolucao.MINIMIZACAO => SolucaoCandidata!.Fitness <= Configuracao.FitnessPretendido,
+            AGProcessoDeEvolucao.MAXIMIZACAO => SolucaoCandidata!.Fitness >= Configuracao.FitnessPretendido,
             _ when GeracaoAtual >= Configuracao.LimiteMáximoDeGeracoesPermitidas => true,
             _ => false
         };
@@ -160,7 +164,7 @@ namespace AlgoritmoGenetico
         protected TCromossoma? AtualizarSolucaoCandidata()
         {
             TCromossoma melhorSolucaoPopulacao = Populacao[0];
-            TCromossoma solucaoRetornar = (Configuracao.ProcessoDeEvolucao, SolucaoCandidata.Fitness, melhorSolucaoPopulacao.Fitness) switch
+            TCromossoma solucaoRetornar = (Configuracao.ProcessoDeEvolucao, SolucaoCandidata!.Fitness, melhorSolucaoPopulacao.Fitness) switch
             {
                 (AGProcessoDeEvolucao.MINIMIZACAO, int sC, int mS) when sC < mS => SolucaoCandidata,
                 (AGProcessoDeEvolucao.MAXIMIZACAO, int sC, int mS) when sC > mS => SolucaoCandidata,
@@ -175,15 +179,20 @@ namespace AlgoritmoGenetico
             else
             {
                 QuantidadeGeracoesSemEvolucao = 0;
+                // Informar que foi atualizado 
+                Configuracao.OutputService.OnMelhorSolucaoEncontrada(SolucaoCandidata, GeracaoAtual);
             }
+            SolucaoCandidata = solucaoRetornar;
 
-            return SolucaoCandidata = solucaoRetornar;
+            return SolucaoCandidata;
         }
 
         protected void InicializarAlgoritmo()
         {
             GeracaoAtual = 0;
-            SolucaoCandidata = (TCromossoma)TCromossoma.CriarAleatorio();
+            SolucaoCandidata = Configuracao.CromossomaFactory.CriarAleatorio();
+            Configuracao.ProcessoCalculoFitness.RecalcularFitness(SolucaoCandidata);
+            Configuracao.ProcessoCalculoFitness.CalcularCodigoUnico(SolucaoCandidata);
 
             _performanceDuracaoEmMilisegundos = Relogio.ElapsedMilliseconds;
             PerformanceTotalDeGeracoes = GeracaoAtual;
@@ -218,9 +227,9 @@ namespace AlgoritmoGenetico
             int dimensaoAtual = Populacao.Count;
             while (dimensaoAtual++ < Configuracao.DimensaoDaPopulacao)
             {
-                Populacao.Add((TCromossoma)TCromossoma.CriarAleatorio());
+                Populacao.Add(Configuracao.CromossomaFactory.CriarAleatorio());
             }
-            Populacao.RecalcularFitness();
+            RecalcularFitness(Populacao);
         }
 
         /// <summary>
@@ -251,14 +260,25 @@ namespace AlgoritmoGenetico
             }
             _feedbackVisualizadoNoSegundo = segundosElapsed;
 
-            if (Configuracao.FeedbackCallback is null)
-            {
-                return;
-            }
-
-            Configuracao.FeedbackCallback(this);
+            Configuracao.OutputService.OnGeracaoProcessada(this);
 
         }
 
+        /// <summary>
+        /// Calcula o fitness de todos os indivíduos em paralelo, utilizando a capacidade multi-core do CPU.
+        /// Deixa dois núcleos livres (Environment.ProcessorCount - 2) para manter a fluidez do sistema.
+        /// </summary>
+        private void RecalcularFitness(List<TCromossoma> populacao)
+        {
+            ParallelOptions options = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount - 2
+            };
+            Parallel.For(0, populacao.Count, options, filhos =>
+            {
+                populacao[filhos].Fitness = Configuracao.ProcessoCalculoFitness.RecalcularFitness(populacao[filhos]);
+                populacao[filhos].CodigoUnico = Configuracao.ProcessoCalculoFitness.CalcularCodigoUnico(populacao[filhos]);
+            });
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using AlgoritmoGenetico.Individuo;
+﻿using System.Diagnostics.CodeAnalysis;
+using AlgoritmoGenetico.Extensao;
+using AlgoritmoGenetico.Individuo;
 using AlgoritmoGenetico.Mutacao;
 using AlgoritmoGenetico.Recombinacao;
 using AlgoritmoGenetico.Selecao;
@@ -31,21 +33,19 @@ public record AGConfiguracao<TCromossoma> where TCromossoma : ICromossoma<IGene>
 
     // --- Estratégias do Algoritmo Genético ---
 
+    public required ICromossomaFitnessService<TCromossoma> ProcessoCalculoFitness { get; init; }
     /// <summary> Define se o processo de evolução é para minimizar ou maximizar a função de fitness. </summary>
-    public AGProcessoDeEvolucao ProcessoDeEvolucao { get; init; } = AGProcessoDeEvolucao.MINIMIZACAO;
+    public required AGProcessoDeEvolucao ProcessoDeEvolucao { get; init; } = AGProcessoDeEvolucao.MINIMIZACAO;
 
     /// <summary> Define a estratégia de mutação a aplicar aos indivíduos. </summary>
-    public IMutacao<TCromossoma> ProcessoDeMutacao { get; init; } = new SemMutacao<TCromossoma>();
-
-    /// <summary> Callback opcional executado imediatamente após a mutação de um cromossoma. </summary>
-    public Action<TCromossoma, AGConfiguracao<TCromossoma>>? ProcessarMutacaoCallback { get; init; }
+    public required IMutacaoService<TCromossoma> ProcessoDeMutacao { get; init; }
 
     /// <summary> Define a estratégia de crossover (recombinação) entre pais para gerar filhos. </summary>
-    public IRecombinacao<TCromossoma> ProcessoDeRecombinacao { get; init; } = new SemRecombinacao<TCromossoma>();
+    public required IRecombinacao<TCromossoma> ProcessoDeRecombinacao { get; init; }
 
     // --- Seleção da próxima geração ---
     /// <summary> Define a estratégia de sobrevivência (quem passa para a próxima geração). </summary>
-    public ISelecao<TCromossoma> ProcessoDeSelecaoDaProximaGeracao { get; init; } = new Truncation<TCromossoma>();
+    public required ISelecao<TCromossoma> ProcessoDeSelecaoDaProximaGeracao { get; init; } = new Truncation<TCromossoma>();
 
     /// <summary> Probabilidade (0.0 a 1.0) de escolher indivíduos do pool de pais para a próxima geração. </summary>
     public float ProbabilidadeDeSelecionarDaGeracaoPais { get; init; } = 0.5f;
@@ -56,7 +56,8 @@ public record AGConfiguracao<TCromossoma> where TCromossoma : ICromossoma<IGene>
     // --- Monitorização ---
     /// <summary> Intervalo de tempo (em segundos) para invocar o callback de feedback. 0 desativa o feedback por tempo. </summary>
     public int DarFeedbackACadaSegundo { get; init; } = 0;
-    /// <summary> Método invocado para monitorização da evolução em tempo real. </summary>    
-    public Action<AG<TCromossoma>>? FeedbackCallback { get; init; }
+    public required ICromossomaFactory<TCromossoma> CromossomaFactory { get; init; }
+
+    public required IAGOutputService<TCromossoma> OutputService { get; init; }
 
 }

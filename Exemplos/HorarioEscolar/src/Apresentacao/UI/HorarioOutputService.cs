@@ -112,6 +112,7 @@ namespace HorarioEscolar.Apresentacao.UI
             horarioTable.AddColumn("[cyan]SEXTA[/]", col => col.Centered());
 
             List<FlatHorario> geneFlat = horarioService.FlatHorario(horario);
+            string professorEmProcesso = horario.First().Professor;
 
             foreach (string horaAProcessar in horarioService.ObterHorasDoDia())
             {
@@ -125,7 +126,7 @@ namespace HorarioEscolar.Apresentacao.UI
                     string mensagem = "                ";
                     FlatHorario? aulaDoDia = aulasNaHora.FirstOrDefault(x => x.DiaDaAula == dia);
 
-                    bool estaBloqueadoNoProf = professorService.ObterProfIndicacaoDeTempoBloqueado(aulaDoDia?.Professor, dia, horaAProcessar) != 0;
+                    bool estaBloqueadoNoProf = professorService.ObterProfIndicacaoDeTempoBloqueado(professorEmProcesso, dia, horaAProcessar) != 0;
                     bool estaBloqueadoEscola = horarioService.ObterHorarioIndicacaoDeTempoBloqueado(dia, horaAProcessar) != 0;
                     bool estaBloqueadoNaTurma = turmaService.ObterTurmaIndicacaoDeTempoBloqueado(aulaDoDia?.Turma, dia, horaAProcessar) != 0;
                     string corDisciplina = estaBloqueadoNaTurma || estaBloqueadoNoProf || estaBloqueadoEscola || (aulaDoDia?.EstaEmColisao ?? false) ? "red" : "yellow";
@@ -138,7 +139,6 @@ namespace HorarioEscolar.Apresentacao.UI
                     else
                     {
                         mensagem = estaBloqueadoEscola ? "[cyan]  ** ESCOLA **  [/]" : mensagem;
-                        mensagem = estaBloqueadoNaTurma ? "[cyan]   ** TURMA **  [/]" : mensagem;
                         mensagem = estaBloqueadoNoProf ? "[cyan]   ** PROF **   [/]" : mensagem;
                     }
 
@@ -149,7 +149,7 @@ namespace HorarioEscolar.Apresentacao.UI
 
             }
 
-            return new Panel(horarioTable.Expand()).Header($"> [green]PROF :[/] [yellow]{horario.First().Professor}[/] <");
+            return new Panel(horarioTable.Expand()).Header($"> [green]PROF :[/] [yellow]{professorEmProcesso}[/] <");
 
         }
 
@@ -200,7 +200,7 @@ namespace HorarioEscolar.Apresentacao.UI
                 }
                 horarioTable.AddRow(colunas);
             }
-            return new Panel(horarioTable.Expand()).Header($"> [green]TURMA :[/] [yellow]{horario.First().Turma}[/] <");
+            return new Panel(horarioTable.Expand()).Header($"> [green]TURMA :[/] [yellow]{turmaEmProcesso}[/] <");
 
         }
 

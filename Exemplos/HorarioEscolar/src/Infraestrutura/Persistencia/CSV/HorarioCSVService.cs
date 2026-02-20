@@ -44,17 +44,14 @@ namespace HorarioEscolar.Infraestrutura.Persistencia.CSV
                         throw new ArgumentOutOfRangeException("Definição dos pesos da semana estão incorretos");
                     }
 
-                    Dictionary<string, Horario> HorariosDict = [];
-                    records.ForEach(record =>
-                    {
-                        HorariosDict[record.Hora] = new Horario()
+                    _horarios = records.Select(record =>
+                        new Horario()
                         {
                             Hora = record.Hora,
                             Dias = record.Dias
-                        };
+                        }
+                    ).ToDictionary(h => h.Hora, h => h);
 
-                    });
-                    _horarios = HorariosDict;
                     _horariosList = _horarios.Keys.ToList();
                     _horariosIndexMap = _horariosList.Select((hora, index) => (hora, index)).ToDictionary(x => x.hora, x => x.index);
 

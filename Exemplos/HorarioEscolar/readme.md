@@ -86,7 +86,7 @@ Durante a execução, o sistema utiliza a biblioteca **Spectre.Console** para fo
 
 - **Distribuição de Fitness:** Apresenta um histograma dinâmico que reflete a distribuição da população. À medida que o algoritmo evolui, indicando como a população está a convergir para a solução ideal (Fitness 0).
 
-- **Métricas de Cache (Flyweight):** Uma tabela detalhada que expõe a eficácia das fábricas de pooling de genes. Taxas de **Cache Hits** elevadas (próximas de 100%) confirmam que a arquitetura está a reutilizar objetos com sucesso, poupando memória e reduzindo o overhead do sistema.
+- **Métricas de Cache:** Uma tabela detalhada que expõe a eficácia das fábricas/cache de pooling de genes. Taxas de **Cache Hits** elevadas (próximas de 100%) confirmam que a arquitetura está a reutilizar objetos com sucesso, poupando memória e reduzindo o overhead do sistema.
 
 - **Pré-visualização Dinâmica:** O dashboard alterna automaticamente a cada **3 segundos** entre a visualização dos horários de diferentes Turmas e Professores. Isto permite validar visualmente a organização das aulas e a resolução de conflitos espaciais e temporais durante o processamento.
 

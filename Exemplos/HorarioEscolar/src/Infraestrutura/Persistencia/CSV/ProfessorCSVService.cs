@@ -35,24 +35,19 @@ namespace HorarioEscolar.Infraestrutura.Persistencia.CSV
                 }))
                 {
                     var records = csv.GetRecords<ProfessorRecord>().ToList();
-                    Dictionary<string, Professor> ProfessoresDict = [];
-
                     if (records.Any(x => x.TemposLetivos.Count() == 0))
                     {
                         throw new ArgumentOutOfRangeException("Definição dos pesos da semana estão incorretos");
                     }
 
-                    records.ForEach(record =>
-                    {
-                        record.Sigla = record.Sigla.ToUpper();
-                        ProfessoresDict[record.Sigla] = new Professor()
-                        {
-                            Sigla = record.Sigla,
-                            TemposLetivos = record.TemposLetivos
-                        };
-                    });
+                    _professores = records.Select(record =>
+                         new Professor()
+                         {
+                             Sigla = record.Sigla.ToUpper(),
+                             TemposLetivos = record.TemposLetivos
+                         }
+                    ).ToDictionary(p => p.Sigla, p => p);
 
-                    _professores = ProfessoresDict;
                     return true;
                 }
 

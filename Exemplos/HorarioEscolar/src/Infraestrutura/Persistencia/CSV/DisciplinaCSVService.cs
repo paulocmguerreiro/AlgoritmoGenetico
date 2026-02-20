@@ -42,19 +42,15 @@ namespace HorarioEscolar.Infraestrutura.Persistencia.CSV
                 }))
                 {
                     var records = csv.GetRecords<DisciplinaRecord>().ToList();
-                    Dictionary<string, Disciplina> DisciplinasDict = [];
 
-                    records.ForEach(record =>
+                    _disciplinas = records.Select(record =>
+                    new Disciplina()
                     {
-                        record.Sigla = record.Sigla.ToUpper();
-                        DisciplinasDict[record.Sigla] = new Disciplina()
-                        {
-                            Sigla = record.Sigla,
-                            TemposLetivos = record.TemposLetivos
-                        };
-                    });
+                        Sigla = record.Sigla.ToUpper(),
+                        TemposLetivos = record.TemposLetivos
+                    })
+                    .ToDictionary(d => d.Sigla, d => d);
 
-                    _disciplinas = DisciplinasDict;
                     return true;
                 }
             }
@@ -103,20 +99,8 @@ namespace HorarioEscolar.Infraestrutura.Persistencia.CSV
                         throw new ArgumentOutOfRangeException("Definição das salas das disciplinas estão incorretas");
                     }
 
-                    Dictionary<string, Disciplina> DisciplinasSalasDict = [];
-                    records.ForEach(record =>
-                    {
-                        record.Sigla = record.Sigla.ToUpper();
+                    records.ForEach(record => _disciplinas![record.Sigla.ToUpper()].Salas = record.Salas);
 
-                        DisciplinasSalasDict[record.Sigla] = new Disciplina
-                        {
-                            Sigla = record.Sigla,
-                            TemposLetivos = _disciplinas![record.Sigla].TemposLetivos,
-                            Salas = record.Salas,
-                        };
-                    });
-
-                    _disciplinas = DisciplinasSalasDict;
                     return true;
                 }
             }

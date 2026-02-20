@@ -43,27 +43,21 @@ namespace HorarioEscolar.Infraestrutura.Persistencia.CSV
                 }))
                 {
                     var records = csv.GetRecords<TurmaRecord>().ToList();
-                    Dictionary<string, Turma> TurmasDict = [];
-
                     if (records.Any(x => x.Disciplinas.Count() == 0))
                     {
                         throw new ArgumentOutOfRangeException("Definição das turmas estão incorretas");
                     }
 
-                    records.ForEach(record =>
-                    {
-                        record.Sigla = record.Sigla.ToUpper();
-                        record.Disciplinas = record.Disciplinas.Select(x => x.ToUpper()).ToList();
-                        TurmasDict[record.Sigla] = new Turma()
+                    _turmas = records.Select(record =>
+                        new Turma()
                         {
-                            Sigla = record.Sigla,
+                            Sigla = record.Sigla.ToUpper(),
+                            Disciplinas = record.Disciplinas.Select(x => x.ToUpper()).ToList(),
                             Professores = [],
-                            Disciplinas = record.Disciplinas,
                             TemposLetivos = []
-                        };
-                    });
+                        })
+                    .ToDictionary(t => t.Sigla, t => t);
 
-                    _turmas = TurmasDict;
                     _turmasList = _turmas.Values.ToList();
 
                     return true;
@@ -113,21 +107,9 @@ namespace HorarioEscolar.Infraestrutura.Persistencia.CSV
                         throw new ArgumentOutOfRangeException("Definição dos Tempos Letivos da turma estão incorretos");
                     }
 
-                    Dictionary<string, Turma> TurmaHorariosDict = [];
-                    records.ForEach(record =>
-                    {
-                        record.Sigla = record.Sigla.ToUpper();
-                        TurmaHorariosDict[record.Sigla] = new Turma
-                        {
-                            Sigla = record.Sigla,
-                            Professores = _turmas![record.Sigla].Professores,
-                            Disciplinas = _turmas![record.Sigla].Disciplinas,
-                            TemposLetivos = record.TemposLetivos,
-                        };
-                    });
+                    records.ForEach(record => _turmas![record.Sigla.ToUpper()].TemposLetivos = record.TemposLetivos);
 
-                    _turmas = TurmaHorariosDict;
-                    _turmasList = _turmas.Values.ToList();
+                    _turmasList = _turmas!.Values.ToList();
                     return true;
                 }
             }
@@ -171,26 +153,10 @@ namespace HorarioEscolar.Infraestrutura.Persistencia.CSV
                 }))
                 {
                     var records = csv.GetRecords<TurmaDisciplinaProfessorRecord>().ToList();
-                    Dictionary<string, Turma> TurmaDisciplinasProfessoresDict = [];
 
-                    records.ForEach(record =>
-                    {
-                        if (!TurmaDisciplinasProfessoresDict.ContainsKey(record.Sigla))
-                        {
-                            record.Sigla = record.Sigla.ToUpper();
-                            TurmaDisciplinasProfessoresDict[record.Sigla] = new Turma
-                            {
-                                Sigla = record.Sigla,
-                                Disciplinas = _turmas![record.Sigla].Disciplinas,
-                                TemposLetivos = _turmas![record.Sigla].TemposLetivos,
-                                Professores = [],
-                            };
-                        }
-                        TurmaDisciplinasProfessoresDict[record.Sigla].Professores.Add(record.Disciplina.ToUpper(), record.Professor.ToUpper());
-                    });
+                    records.ForEach(record => _turmas![record.Sigla.ToUpper()].Professores.Add(record.Disciplina.ToUpper(), record.Professor.ToUpper()));
 
-                    _turmas = TurmaDisciplinasProfessoresDict;
-                    _turmasList = _turmas.Values.ToList();
+                    _turmasList = _turmas!.Values.ToList();
                     return true;
                 }
 

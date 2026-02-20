@@ -34,25 +34,23 @@ Para que o motor arranque, é **obrigatória** a existência de uma pasta `./DAT
 O sistema é altamente parametrizável através da classe `AGConfiguracao`. Exemplo de configuração utilizada (baseada no `Program.cs`):
 
 ```csharp
-AGConfiguracao<HorarioCromossoma> agConfig = new AGConfiguracao<HorarioCromossoma>
-{
-    DimensaoDaPopulacao = 50,
-    LimiteMáximoDeGeracoesPermitidas = 50000,
-    FitnessPretendido = 0f,
-    ProcessoDeEvolucao = AGProcessoDeEvolucao.MINIMIZACAO,
-
-    // Recombinação e Seleção
-    ProcessoDeRecombinacao = new Uniforme<HorarioCromossoma>(),
-    ProcessoDeSelecaoDaProximaGeracao = new Crowding<HorarioCromossoma>(),
-
-    // Mutação
-    ProcessoDeMutacao = new Multipla<HorarioCromossoma> {
-        FatorMutacaoColisao = 0.50d,
-        FatorMutacaoNormal = 0.05d,
-        QuantidadeDeMutacoes = 10
-    },
-    ProcessarMutacaoCallback = mutacaoExt.ProcessarMutacao
-};
+    AGConfiguracao<HorarioCromossoma> agConfig = new AGConfiguracao<HorarioCromossoma>
+    {
+        DimensaoDaPopulacao = 100,
+        LimiteMáximoDeGeracoesPermitidas = 50000,
+        FitnessPretendido = 0f,
+        ReporSolucaoCandidataNaPopulacaoACadaGeracao = 50,
+        DarFeedbackACadaSegundo = 1,
+        ProcessoDeEvolucao = AGProcessoDeEvolucao.MINIMIZACAO,
+        ProcessoCalculoFitness = fitnessService,
+        ProcessoDeSelecaoDaProximaGeracao = selecaoService,
+        ProcessoDeRecombinacao = recombinacaoService,
+        ProcessoDeMutacao = mutacaoService,
+        ProbabilidadeDeSelecionarDaGeracaoPais = 0.25f,
+        ProbabilidadeDeSelecionarDaGeracaoFilhos = .75f,
+        CromossomaFactory = cromossomaFactory,
+        OutputService = outputService
+    };
 ```
 
 ## 🛠️ Compilação e Execução

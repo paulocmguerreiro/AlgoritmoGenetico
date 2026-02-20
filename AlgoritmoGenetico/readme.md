@@ -68,35 +68,30 @@ O motor inclui um conjunto de estratégias predefinidas que podem ser utilizadas
 Exemplo de como configurar o motor para uma implementação concreta:
 
 ```csharp
-var configuracao = new AGConfiguracao<MeuCromossoma>
+AGHorarioEscolar<HorarioCromossoma> ConfigurarAlgoritmo()
 {
-    // Dimensões e Limites
-    DimensaoDaPopulacao = 100,
-    LimiteMáximoDeGeracoesPermitidas = 5000,
-    FitnessPretendido = 0,
-
-    // Direção da Evolução
-    ProcessoDeEvolucao = AGProcessoDeEvolucao.MINIMIZACAO,
-
-    // Injeção de Estratégias
-    ProcessoDeSelecaoDaProximaGeracao = new Tournament<MeuCromossoma>(),
-    ProbabilidadeDeSelecionarDaGeracaoPais = 0.10f,     // 10% da geração angterior (pais)
-    ProbabilidadeDeSelecionarDaGeracaoFilhos = .90f,    // 90% dos filhos
-    ProcessoDeRecombinacao = new TwoPoints<MeuCromossoma>(),
-
-    // Implementação de Mutação para o Domínio
-    ProcessoDeMutacao = new Unica<MeuCromossoma>
+    AGConfiguracao<HorarioCromossoma> agConfig = new AGConfiguracao<HorarioCromossoma>
     {
-        FatorMutacaoNormal = 0.02d,    // 2% de probabilidade base
-        FatorMutacaoColisao = 0.12d,   // 12% se detetar conflitos no gene
-        AjustarMutacaoACadaGeracao = 50
-    },
+        DimensaoDaPopulacao = 100,
+        LimiteMáximoDeGeracoesPermitidas = 50000,
+        FitnessPretendido = 0f,
+        ReporSolucaoCandidataNaPopulacaoACadaGeracao = 50,
+        DarFeedbackACadaSegundo = 1,
+        ProcessoDeEvolucao = AGProcessoDeEvolucao.MINIMIZACAO,
+        ProcessoCalculoFitness = fitnessService,
+        ProcessoDeSelecaoDaProximaGeracao = selecaoService,
+        ProcessoDeRecombinacao = recombinacaoService,
+        ProcessoDeMutacao = mutacaoService,
+        ProbabilidadeDeSelecionarDaGeracaoPais = 0.25f,
+        ProbabilidadeDeSelecionarDaGeracaoFilhos = .75f,
+        CromossomaFactory = cromossomaFactory,
+        OutputService = outputService
+    };
 
-    // Feedback e Observabilidade
-    DarFeedbackACadaSegundo = 1,
-    FeedbackCallback = (motor) => {
-        // Integração com a UI (ex: Spectre.Console)
-        Console.WriteLine(motor.PerformanceInfo());
-    }
-};
+    return new AGHorarioEscolar<HorarioCromossoma>
+    {
+        Configuracao = agConfig,
+    };
+
+}
 ```

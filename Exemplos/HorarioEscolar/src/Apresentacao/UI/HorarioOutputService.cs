@@ -169,33 +169,32 @@ namespace HorarioEscolar.Apresentacao.UI
             horarioTable.AddColumn("[cyan]SEXTA[/]", col => col.Centered());
 
             List<FlatHorario> geneFlat = horarioService.FlatHorario(horario);
-
+            string turmaEmProcesso = horario.First().Turma;
             foreach (string horaAProcessar in horarioService.ObterHorasDoDia())
             {
                 string[] colunas = new string[6];
                 colunas[0] = $"[cyan]{horaAProcessar}[/]";
 
                 List<FlatHorario> aulasNaHora = geneFlat.Where(x => x.HoraInicioDaAula == horaAProcessar).ToList();
-
+                FlatHorario? aulasEmProcesso = aulasNaHora.FirstOrDefault();
                 for (int dia = 0; dia < 5; dia++)
                 {
                     string mensagem = "                ";
                     FlatHorario? aulaDoDia = aulasNaHora.FirstOrDefault(x => x.DiaDaAula == dia);
-                    bool estaBloqueadoNaTurma = turmaService.ObterTurmaIndicacaoDeTempoBloqueado(aulaDoDia?.Turma, dia, horaAProcessar) != 0;
+                    bool estaBloqueadoNaTurma = turmaService.ObterTurmaIndicacaoDeTempoBloqueado(turmaEmProcesso, dia, horaAProcessar) != 0;
                     bool estaBloqueadoEscola = horarioService.ObterHorarioIndicacaoDeTempoBloqueado(dia, horaAProcessar) != 0;
-                    bool estaBloqueadoNoProf = professorService.ObterProfIndicacaoDeTempoBloqueado(aulaDoDia?.Professor, dia, horaAProcessar) != 0;
+                    bool estaBloqueadoNoProf = professorService.ObterProfIndicacaoDeTempoBloqueado(aulasEmProcesso?.Professor, dia, horaAProcessar) != 0;
                     string corDisciplina = estaBloqueadoNoProf || estaBloqueadoNaTurma || estaBloqueadoEscola || (aulaDoDia?.EstaEmColisao ?? false) ? "red" : "yellow";
                     string corSala = estaBloqueadoNoProf || estaBloqueadoNaTurma || estaBloqueadoEscola || (aulaDoDia?.EstaEmColisao ?? false) ? "red" : "green";
 
-                    if (aulaDoDia != null)
+                    if (aulaDoDia is not null)
                     {
-                        mensagem = ($"[{corDisciplina}]{aulaDoDia.Disciplina.PadRight(8).Substring(0, 8),8}[/] [{corSala}]{aulaDoDia.SalaDeAula.PadLeft(6).Substring(0, 6),6}[/]");
+                        mensagem = $"[{corDisciplina}]{aulaDoDia.Disciplina.PadRight(8).Substring(0, 8),8}[/] [{corSala}]{aulaDoDia.SalaDeAula.PadLeft(6).Substring(0, 6),6}[/]";
                     }
                     else
                     {
                         mensagem = estaBloqueadoEscola ? "[cyan]  ** ESCOLA **  [/]" : mensagem;
                         mensagem = estaBloqueadoNaTurma ? "[cyan]   ** TURMA **  [/]" : mensagem;
-                        mensagem = estaBloqueadoNoProf ? "[cyan]   ** PROF **   [/]" : mensagem;
                     }
                     colunas[dia + 1] = mensagem;
                 }

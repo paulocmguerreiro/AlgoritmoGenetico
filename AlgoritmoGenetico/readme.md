@@ -1,5 +1,7 @@
 # 🧬 AG Engine: Motor de Algoritmo Genético Multi-Propósito
 
+![.NET](https://img.shields.io/badge/.NET-8.0%2B-512BD4?logo=dotnet&logoColor=white) ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
+
 Um motor (Framework) de **Algoritmo Genético (AG)** genérico e desenvolvido em .NET. Este projeto fornece a infraestrutura necessária para resolver problemas de otimização complexos, abstraindo a lógica evolutiva da implementação específica do domínio.
 
 ---
@@ -36,16 +38,16 @@ A separação de responsabilidades é garantida através de três pilares:
 Para utilizar este motor num projeto, o fluxo de implementação exige a definição dos componentes de domínio e a personalização dos operadores que dependem da estrutura genética:
 
 1. **Definição Genética (Domínio)**:
-    - Implementar `IGene` para representar a unidade básica da solução (ex: uma aula).
-    - Implementar `ICromossoma<IGene>` para definir a lógica de avaliação (**Fitness**) e os métodos de fabricação (`CriarVazio`, `CriarAleatorio`).
+- Implementar `IGene` para representar a unidade básica da solução (ex: uma aula).
+- Implementar `ICromossoma<IGene>` para definir a lógica de avaliação (**Fitness**) e os métodos de fabricação (`CriarVazio`, `CriarAleatorio`).
 
 2. **Escolha e Implementação do Processo de Mutação**:
-    - **Flexibilidade**: O utilizador pode escolher entre as estratégias de mutação já incluídas ou criar processos inteiramente novos.
-    - **Implementação Obrigatória**: Independentemente da estratégia escolhida, é necessário implementar a lógica de mutação específica. Como a mutação altera diretamente o estado dos genes, ela depende do conhecimento das regras de problema (ex: garantir que um novo valor sorteado para o gene é válido e não viola as restrições do problema).
+- **Flexibilidade**: O utilizador pode escolher entre as estratégias de mutação já incluídas ou criar processos inteiramente novos.
+- **Implementação Obrigatória**: Independentemente da estratégia escolhida, é necessário implementar a lógica de mutação específica. Como a mutação altera diretamente o estado dos genes, ela depende do conhecimento das regras de problema (ex: garantir que um novo valor sorteado para o gene é válido e não viola as restrições do problema).
 
 3. **Configuração e Orquestração**:
-    - Estender a classe abstrata `AG<TCromossoma>` para ligar o motor ao domínio específico.
-    - Configurar o objeto `AGConfiguracao` com as taxas de mutação, dimensões da população e os delegados de feedback.
+- Estender a classe abstrata `AG<TCromossoma>` para ligar o motor ao domínio específico.
+- Configurar o objeto `AGConfiguracao` com as taxas de mutação, dimensões da população e os delegados de feedback.
 
 ---
 
@@ -53,13 +55,11 @@ Para utilizar este motor num projeto, o fluxo de implementação exige a defini�
 
 O motor inclui um conjunto de estratégias predefinidas que podem ser utilizadas imediatamente ou servir de base para novas extensões.
 
-| Categoria        | Operadores Incluídos                                                           | Descrição                                                                                   |
+| Categoria | Operadores Incluídos | Descrição |
 | :--------------- | :----------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
-| **Seleção**      | `Truncation`, `Tournament`, `Roulette Wheel`, `Crowding`,`Todos`               | Filtros para definir quem sobrevive e quem procria (focados em performance ou diversidade). |
-| **Recombinação** | `Single Point`, `Two Points`, `Uniforme`, `CycleCrossOver`, `Sem recombinação` | Diferentes métodos para misturar o material genético dos progenitores.                      |
-| **Mutação**      | `Unica`, `Multipla`, `Sem mutação`                                             | Estratégias que definem a abrangência da alteração genética por indivíduo.                  |
-
----
+| **Seleção** | `Truncation`, `Tournament`, `Roulette Wheel`, `Crowding`,`Todos` | Filtros para definir quem sobrevive e quem procria (focados em performance ou diversidade). |
+| **Recombinação** | `Single Point`, `Two Points`, `Uniforme`, `CycleCrossOver`, `Sem recombinação` | Diferentes métodos para misturar o material genético dos progenitores. |
+| **Mutação** | `Unica`, `Multipla`, `Sem mutação` | Estratégias que definem a abrangência da alteração genética por indivíduo. |
 
 ---
 
@@ -70,28 +70,40 @@ Exemplo de como configurar o motor para uma implementação concreta:
 ```csharp
 AGHorarioEscolar<HorarioCromossoma> ConfigurarAlgoritmo()
 {
-    AGConfiguracao<HorarioCromossoma> agConfig = new AGConfiguracao<HorarioCromossoma>
-    {
-        DimensaoDaPopulacao = 100,
-        LimiteMáximoDeGeracoesPermitidas = 50000,
-        FitnessPretendido = 0f,
-        ReporSolucaoCandidataNaPopulacaoACadaGeracao = 50,
-        DarFeedbackACadaSegundo = 1,
-        ProcessoDeEvolucao = AGProcessoDeEvolucao.MINIMIZACAO,
-        ProcessoCalculoFitness = fitnessService,
-        ProcessoDeSelecaoDaProximaGeracao = selecaoService,
-        ProcessoDeRecombinacao = recombinacaoService,
-        ProcessoDeMutacao = mutacaoService,
-        ProbabilidadeDeSelecionarDaGeracaoPais = 0.25f,
-        ProbabilidadeDeSelecionarDaGeracaoFilhos = .75f,
-        CromossomaFactory = cromossomaFactory,
-        OutputService = outputService
-    };
+AGConfiguracao<HorarioCromossoma> agConfig = new AGConfiguracao<HorarioCromossoma>
+{
+DimensaoDaPopulacao = 100,
+LimiteMáximoDeGeracoesPermitidas = 50000,
+FitnessPretendido = 0f,
+ReporSolucaoCandidataNaPopulacaoACadaGeracao = 50,
+DarFeedbackACadaSegundo = 1,
+ProcessoDeEvolucao = AGProcessoDeEvolucao.MINIMIZACAO,
+ProcessoCalculoFitness = fitnessService,
+ProcessoDeSelecaoDaProximaGeracao = selecaoService,
+ProcessoDeRecombinacao = recombinacaoService,
+ProcessoDeMutacao = mutacaoService,
+ProbabilidadeDeSelecionarDaGeracaoPais = 0.25f,
+ProbabilidadeDeSelecionarDaGeracaoFilhos = .75f,
+CromossomaFactory = cromossomaFactory,
+OutputService = outputService
+};
 
-    return new AGHorarioEscolar<HorarioCromossoma>
-    {
-        Configuracao = agConfig,
-    };
+return new AGHorarioEscolar<HorarioCromossoma>
+{
+Configuracao = agConfig,
+};
 
 }
 ```
+
+---
+
+## 🏫 Exemplo Prático
+
+Este motor é utilizado num caso real de escalonamento de horários escolares, com deteção de conflitos e dashboard em tempo real: [`Exemplos/HorarioEscolar`](../Exemplos/HorarioEscolar).
+
+---
+
+## 📄 Licença
+
+Este projeto está licenciado sob **GPL-3.0**. Ver o ficheiro [LICENSE](../LICENSE) na raiz do repositório.

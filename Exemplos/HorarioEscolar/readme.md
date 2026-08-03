@@ -4,6 +4,24 @@ Este projeto implementa um motor de **Algoritmo Genético (AG)** de alto desempe
 
 ---
 
+## 📊 Dashboard e Observabilidade
+
+Durante a execução, o sistema utiliza a biblioteca **Spectre.Console** para fornecer um painel de controlo visual e técnico, permitindo a monitorização em tempo real do progresso evolutivo.
+
+![Dashboard em Execução](./docs/dashboard.png)
+
+### Informações Disponíveis em Tempo Real:
+
+- **Distribuição de Fitness:** Apresenta um histograma dinâmico que reflete a distribuição da população. À medida que o algoritmo evolui, indicando como a população está a convergir para a solução ideal (Fitness 0).
+
+- **Métricas de Cache:** Uma tabela detalhada que expõe a eficácia das fábricas/cache de pooling de genes. Taxas de **Cache Hits** elevadas (próximas de 100%) confirmam que a arquitetura está a reutilizar objetos com sucesso, poupando memória e reduzindo o overhead do sistema.
+
+- **Pré-visualização Dinâmica:** O dashboard alterna automaticamente a cada **3 segundos** entre a visualização dos horários de diferentes Turmas e Professores. Isto permite validar visualmente a organização das aulas e a resolução de conflitos espaciais e temporais durante o processamento.
+
+- **Saúde da Memória:** Monitorização em tempo real das recolhas do **Garbage Collector (GC)** e do consumo de RAM, garantindo que o motor se mantém estável mesmo em execuções longas com populações densas.
+
+---
+
 ## 🚀 Arquitetura e Estratégia
 
 A solução baseia-se num modelo de **Minimização de Conflitos**, onde o objetivo é atingir um Fitness de `0`.
@@ -34,23 +52,23 @@ Para que o motor arranque, é **obrigatória** a existência de uma pasta `./DAT
 O sistema é altamente parametrizável através da classe `AGConfiguracao`. Exemplo de configuração utilizada (baseada no `Program.cs`):
 
 ```csharp
-    AGConfiguracao<HorarioCromossoma> agConfig = new AGConfiguracao<HorarioCromossoma>
-    {
-        DimensaoDaPopulacao = 100,
-        LimiteMáximoDeGeracoesPermitidas = 50000,
-        FitnessPretendido = 0f,
-        ReporSolucaoCandidataNaPopulacaoACadaGeracao = 50,
-        DarFeedbackACadaSegundo = 1,
-        ProcessoDeEvolucao = AGProcessoDeEvolucao.MINIMIZACAO,
-        ProcessoCalculoFitness = fitnessService,
-        ProcessoDeSelecaoDaProximaGeracao = selecaoService,
-        ProcessoDeRecombinacao = recombinacaoService,
-        ProcessoDeMutacao = mutacaoService,
-        ProbabilidadeDeSelecionarDaGeracaoPais = 0.25f,
-        ProbabilidadeDeSelecionarDaGeracaoFilhos = .75f,
-        CromossomaFactory = cromossomaFactory,
-        OutputService = outputService
-    };
+AGConfiguracao<HorarioCromossoma> agConfig = new AGConfiguracao<HorarioCromossoma>
+{
+DimensaoDaPopulacao = 100,
+LimiteMáximoDeGeracoesPermitidas = 50000,
+FitnessPretendido = 0f,
+ReporSolucaoCandidataNaPopulacaoACadaGeracao = 50,
+DarFeedbackACadaSegundo = 1,
+ProcessoDeEvolucao = AGProcessoDeEvolucao.MINIMIZACAO,
+ProcessoCalculoFitness = fitnessService,
+ProcessoDeSelecaoDaProximaGeracao = selecaoService,
+ProcessoDeRecombinacao = recombinacaoService,
+ProcessoDeMutacao = mutacaoService,
+ProbabilidadeDeSelecionarDaGeracaoPais = 0.25f,
+ProbabilidadeDeSelecionarDaGeracaoFilhos = .75f,
+CromossomaFactory = cromossomaFactory,
+OutputService = outputService
+};
 ```
 
 ## 🛠️ Compilação e Execução
@@ -65,29 +83,29 @@ Para garantir que o algoritmo opere com a máxima eficiência (especialmente as 
 ### Passos para Compilar e Correr
 
 1. **Restaurar as dependências:**
-   dotnet restore
+dotnet restore
 
 2. **Compilar o projeto em modo Release:**
-   dotnet build -c Release
+dotnet build -c Release
 
 3. **Executar a aplicação:**
-   dotnet run
-   dotnet run -c Release --no-build
+dotnet run -c Release --no-build
 
 Se algum ficheiro na pasta DATA estiver em falta ou mal formatado, o sistema apresentará uma mensagem de erro detalhada e interromperá a execução de forma segura.
 
-## 📊 Dashboard e Observabilidade
+---
 
-Durante a execução, o sistema utiliza a biblioteca **Spectre.Console** para fornecer um painel de controlo visual e técnico, permitindo a monitorização em tempo real do progresso evolutivo.
+## 🗺️ Roadmap / Próximos Passos
 
-![Dashboard em Execução](./docs/dashboard.png)
+O motor e este exemplo estão concluídos e funcionais. Ficam identificadas as seguintes extensões futuras para o caso de uso escolar:
 
-### Informações Disponíveis em Tempo Real:
+- **Par pedagógico:** suporte para dois professores atribuídos à mesma turma/sala em simultâneo.
+- **Gestão de deslocação entre escolas:** tempo mínimo de deslocação para professores que lecionam em várias escolas do mesmo agrupamento.
+- **Eliminação de "buracos" no horário:** penalização de espaços vazios entre aulas na função de fitness.
+- **Facilitação do preenchimento dos ficheiros estruturais:** ferramentas de apoio à criação/validação dos CSV de horários, professores, turmas e salas.
 
-- **Distribuição de Fitness:** Apresenta um histograma dinâmico que reflete a distribuição da população. À medida que o algoritmo evolui, indicando como a população está a convergir para a solução ideal (Fitness 0).
+---
 
-- **Métricas de Cache:** Uma tabela detalhada que expõe a eficácia das fábricas/cache de pooling de genes. Taxas de **Cache Hits** elevadas (próximas de 100%) confirmam que a arquitetura está a reutilizar objetos com sucesso, poupando memória e reduzindo o overhead do sistema.
+## 📄 Licença
 
-- **Pré-visualização Dinâmica:** O dashboard alterna automaticamente a cada **3 segundos** entre a visualização dos horários de diferentes Turmas e Professores. Isto permite validar visualmente a organização das aulas e a resolução de conflitos espaciais e temporais durante o processamento.
-
-- **Saúde da Memória:** Monitorização em tempo real das recolhas do **Garbage Collector (GC)** e do consumo de RAM, garantindo que o motor se mantém estável mesmo em execuções longas com populações densas.
+Este exemplo está licenciado sob **GPL-3.0**, tal como o [motor de Algoritmo Genético](../../AlgoritmoGenetico) em que se baseia. Ver o ficheiro [LICENSE](../../LICENSE) na raiz do repositório.
